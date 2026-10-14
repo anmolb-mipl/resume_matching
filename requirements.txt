@@ -1,0 +1,26 @@
+# CV Matcher: Python packages.   Install with:  pip install -r requirements.txt
+#
+# NOT installed by pip (only needed to read scanned/image PDFs):
+#   - Tesseract OCR  (Windows installer from UB Mannheim)
+#   - Poppler        (Windows build from oschwartz10612/poppler-windows)
+# Set their paths in cv_extracter.py (read_pdf_ocr).
+
+# --- user interface ---
+streamlit>=1.40
+pandas
+
+# --- reading CVs ---
+pdfplumber
+python-docx
+pytesseract
+pdf2image
+Pillow
+
+# --- search and ranking (large download: includes PyTorch) ---
+sentence-transformers
+chromadb
+
+# --- API server (optional: the Streamlit app does not need it) ---
+fastapi
+uvicorn
+python-multipart

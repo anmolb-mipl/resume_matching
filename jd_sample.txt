@@ -1,0 +1,22 @@
+Senior Machine Learning Engineer
+
+About Us
+We are a fast growing startup building HR tech products. We offer free lunches and flexible hours.
+
+Responsibilities
+- Build and deploy NLP models for resume parsing and candidate ranking.
+- Design data pipelines and retraining workflows.
+- Work with product managers to define success metrics.
+
+Requirements
+- 4+ years of experience in machine learning engineering.
+- Strong Python skills with PyTorch or TensorFlow.
+- Experience deploying models on AWS or GCP.
+Tools: Docker, Kubernetes, MLflow, Airflow
+
+Nice to have
+- Experience with vector databases and semantic search.
+- Contributions to open source projects.
+
+Equal Opportunity
+We are an equal opportunity employer.

@@ -1,0 +1,33 @@
+# --- Python ---
+venv/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# --- Personal data: NEVER commit CVs, extracted text, or databases ---
+cvs/
+uploads/
+extracted_texts/
+section/
+sections/
+workspaces/
+chroma_store/
+*.db
+*.sqlite
+*.sqlite3
+*.pdf
+*.docx
+test_cvs/
+sample_cvs/
+same_name_test/
+
+# --- Secrets and local settings ---
+.env
+.streamlit/secrets.toml
+
+# --- Editors and OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
