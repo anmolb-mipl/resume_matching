@@ -92,6 +92,7 @@ def rerank(queries: list[dict], hits: list[list[dict]], first_pass: list[dict], 
         for qi, q in enumerate(queries):
             p, h = best.get((qi, cand["cv_id"]), (0.0, None))
             before = cand["details"][qi]
+            p *= before.get("years_factor", 1.0)             # keep the "N+ years" check from the first pass
             weighted += q["weight"] * p
             details.append({
                 **before,

@@ -18,6 +18,8 @@ import re
 import sys
 from pathlib import Path
 
+from experience import parse_years_requirement
+
 MAX_QUERIES = 15
 
 # Weight = how much a requirement counts in the final score
@@ -121,25 +123,35 @@ def _process_jd(raw: str) -> dict:
     lines = [l for l in raw.splitlines()]
     queries: list[dict] = []
 
-    def add(text: str, kind: str):
+    def add(text: str, kind: str, min_years=None, years_scope=None):
         text = text.strip()
         if text and text.lower() not in {q["text"].lower() for q in queries}:
-            queries.append({"text": text, "weight": WEIGHTS[kind], "kind": kind})
+            queries.append({"text": text, "weight": WEIGHTS[kind], "kind": kind,
+                            "min_years": min_years, "years_scope": years_scope})
 
     # --- Case 1: a short skills list, e.g. "Python, SQL, AWS, Docker" ---
     non_empty = [l for l in lines if l.strip()]
-    if len(non_empty) <= 3 and looks_like_skill_list(" ".join(non_empty)):
-        skills = split_skills(" ".join(non_empty))
+    list_text, list_years, list_scope = " ".join(non_empty), None, None
+    if len(non_empty) <= 3:
+        stripped, n, scope = parse_years_requirement(list_text, keep_experience_word=False)
+        if n and looks_like_skill_list(stripped):
+            list_text, list_years, list_scope = stripped, n, scope
+    if len(non_empty) <= 3 and looks_like_skill_list(list_text):
+        skills = split_skills(list_text)
         for s in skills:
             add(f"Experience with {s}", "skill")
         if len(skills) >= 2:
             add("Candidate with experience in " + ", ".join(skills), "overall")
-        return {"title": None, "years_mentioned": [], "queries": queries[:MAX_QUERIES]}
+        if list_years:
+            add("Relevant professional work experience", "role", list_years, list_scope)
+        return {"title": None, "years_mentioned": [list_years] if list_years else [],
+                "queries": queries[:MAX_QUERIES]}
 
     # --- Case 2: a very short free-text request, e.g. "backend developer with FastAPI" ---
     if len(raw.split()) <= 8 and len(non_empty) == 1:
-        add(raw.rstrip("."), "role")
-        return {"title": None, "years_mentioned": [], "queries": queries}
+        text, years, scope = parse_years_requirement(raw.rstrip("."))
+        add(text, "role", years, scope)
+        return {"title": None, "years_mentioned": [years] if years else [], "queries": queries}
 
     # --- Case 3: a full job description ---
     title = None
@@ -170,6 +182,10 @@ def _process_jd(raw: str) -> dict:
 
     def handle_unit(unit: str, kind: str):
         if len(unit.split()) < 3:
+            return
+        text, years, scope = parse_years_requirement(unit)
+        if years:                                   # "3+ years of Python": keep the number as a number
+            add(text, kind, years, scope)
             return
         colon = unit.split(":", 1)
         if len(colon) == 2 and looks_like_skill_list(colon[1]):
@@ -227,7 +243,9 @@ def main():
     print(f"Title: {result['title']}   Years mentioned: {result['years_mentioned']}   "
           f"Top N requested: {result['top_n']}\n")
     for q in result["queries"]:
-        print(f"[{q['kind']:7} w={q['weight']}] {q['text']}")
+        years = f"   <- needs {q['min_years']}+ years" + (f" of {q['years_scope']}" if q["years_scope"] else " overall") \
+            if q.get("min_years") else ""
+        print(f"[{q['kind']:7} w={q['weight']}] {q['text']}{years}")
     print(f"\n{len(result['queries'])} queries")
 
 
